@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+# 모델·영상은 Git 에 올리지 않음 (용량, 얼굴)
+models/*
+!models/README.md
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.pt

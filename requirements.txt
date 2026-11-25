@@ -1,0 +1,10 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+# 진짜 모델을 붙일 때 추가 (학습 환경과 같은 버전으로 — joblib 은 만든 scikit-learn 버전에서만 안전하게 열림)
+# ultralytics
+# opencv-python-headless
+# lap
+# numpy
+# scikit-learn
+# joblib
