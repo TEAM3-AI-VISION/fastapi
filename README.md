@@ -4,7 +4,8 @@
 로그인·DB 저장·작업 상태는 backend(Django)가 맡고, 이 서버는 DB 를 모릅니다.
 
 - API 명세서: [API.md](API.md) — backend 와의 약속
-- 담당: FastAPI 2명 (A: `pose.py` · B: `predict.py` · 같이: `main.py`, 리뷰)
+- 담당: FastAPI 2명 — @wlgptjd333 · @tjrqja021206-a11y (A: `pose.py` · B: `predict.py` 는 둘이 정함 · 같이: `main.py`, 리뷰)
+- backend 가 DB 칸을 정할 때: [API.md — AI 가 줄 수 있는 데이터 최소/최대](API.md#ai-가-줄-수-있는-데이터--최소--최대-backend-db-설계용)
 
 ## 1. 하는 일 (그림)
 
@@ -55,6 +56,8 @@ Docker: `docker build -t team3-fastapi . && docker run -p 8001:8001 team3-fastap
 - [ ] B: `predict.predict_person` — 학습 때와 같은 숫자 만들기, 30단계, 모델 확률
 - [ ] 모델 파일 정하기 (팀 학습 결과) → `models/` 에 두고 가짜 모드 끄기
 - [ ] 짧은 영상 하나로 진짜 `/predict` 테스트 추가
+- [ ] A·B 나누기 (둘이 정해서 위 담당 줄 고치기)
+- [ ] backend 가 Celery 에서 `/predict` 를 불러 가짜 응답을 받는지 확인 (기능 하나씩: 먼저 이것만)
 - [ ] backend 와 `docker compose` 로 연결 확인
 
 참고 (개인 프로젝트에서 이미 겪은 것):

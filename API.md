@@ -91,6 +91,39 @@ backend 처리 약속: 400 → 작업 `FAILURE` + `detail` 문구를 사용자�
 
 ---
 
+## AI 가 줄 수 있는 데이터 — 최소 / 최대 (backend DB 설계용)
+
+**최소** = 지금 v1 응답 (위 표). 화면에 "누가 · 무슨 동작 · 몇 %" 를 띄우는 데 이것만 있으면 됩니다.
+
+**최대** = 개인 프로젝트(같은 모델 구조)에서 실제로 돌려줬던 값. 지금은 안 보내고, 필요하다고 정하면 v2 에 넣습니다.
+backend 는 **최소는 꼭 저장할 칸**을 만들고, 최대는 아래 "저장?" 을 보고 고르세요.
+
+| 필드 | 타입 · 범위 | 뜻 | 저장? |
+|---|---|---|---|
+| `people[].top3` | 배열 3개 `{action_id, action_name, probability}` | 확률 높은 동작 3개 (1등이 애매할 때 2·3등) | 권장 (JSON 칸 하나) |
+| `people[].windows` | 배열 1~수십 개 `{start_sec, end_sec, action_id, confidence}` | 영상을 8초 창(4초씩 밀며)으로 나눠 본 창마다 결과 → "몇 초에 무슨 동작" | 선택 (타임라인 화면을 만들면) |
+| `people[].category` | string 5종 `violence` · `property_damage` · `theft_suspect` · `emergency` · `loitering` | 동작 묶음 → 알림 등급 | 권장 (필터용) |
+| `people[].track_seconds` | number 0~영상 길이 | 이 사람이 화면에 보인 시간(초) | 선택 |
+| `people[].valid_ratio` | number 0~1 | 관절이 잘 보인 Frame 비율 (낮으면 결과 믿기 어려움) | 선택 |
+| `people[].mean_keypoint_conf` | number 0~1 | 관절 Confidence 평균 | 선택 |
+| `skipped` | 배열 `{track_id, reason}` | 사람은 보였지만 판단 안 한 경우와 이유 (너무 짧게 보임 · 사람 아닌 물체 등) | 권장 (사용자에게 "왜 결과가 없나" 보여 줌) |
+| `video.fps` | number | 영상 Frame 수 / 초 | 선택 |
+| `processing_seconds` | number | 서버가 분석에 쓴 시간 | 선택 (느린지 볼 때) |
+| `model` | string | 결과를 낸 모델 이름 | **꼭** (모델을 바꾼 뒤 옛 결과와 구분) |
+
+**크기 감 (8초 영상 기준)**
+
+| | 최소 (v1) | 최대 |
+|---|---|---|
+| 사람 수 | 0명이면 `people: []` | 보통 1~3명, 많아도 10명 안쪽 |
+| 응답 크기 | 약 0.3KB | 사람 1명당 약 1~2KB (`windows` 가 대부분) |
+| 처리 시간 | 가짜 모드 즉시 | CPU 수십 초 · GPU 약 4초 (개인 프로젝트 측정) |
+
+정리: Django 모델은 **영상 1 : 사람 결과 N**. 사람 결과 행에 `track_id` · `action_id` · `action_name` · `confidence` · `uncertain` 칸,
+영상 행에 `seconds` · `frames` · `width` · `height` · `model` 칸. 더 받고 싶은 값은 `JSONField` 하나(`extra`)에 넣으면 v2 에서 칸을 안 바꿔도 됩니다.
+
+---
+
 ## 동작 번호 (3팀 통일 표기, motion-capture 데이터와 같음)
 
 | 번호 | 이름 | 번호 | 이름 |
@@ -112,3 +145,4 @@ backend 처리 약속: 400 → 작업 `FAILURE` + `detail` 문구를 사용자�
 | 날짜 | 버전 | 내용 |
 |---|---|---|
 | 2026-11-25 | v1 | 처음 작성 (`/health`, `/predict`) |
+| 2026-11-25 | v1 | "AI 가 줄 수 있는 데이터 최소/최대" 추가 (응답은 그대로) |
